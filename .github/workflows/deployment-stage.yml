@@ -1,0 +1,28 @@
+name: Deploy STAGE
+on:
+  push:
+    branches: [ stage ]
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install
+        run: npm install
+      - name: Build
+        env:
+          VITE_COGNITO_DOMAIN: https://user-stage.testigoelectoral.org
+          VITE_COGNITO_CLIENT_ID: rgitk5c3ca9k3v00n4qcjot7b
+        run: |
+          env|grep "^VITE_" > .env
+          npm run build
+      - name: Publish APP
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_STAGE }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_STAGE }}
+          AWS_REGION: "us-east-1"
+          BUCKET: "testigoelectoral-webapp-stage"
+        run: |
+          aws s3 sync build/ s3://${BUCKET}
