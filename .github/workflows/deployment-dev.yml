@@ -25,5 +25,14 @@ jobs:
           AWS_REGION: "us-west-1"
           BUCKET: "testigoelectoral-webapp-dev"
         run: |
-          aws s3 sync build/ s3://${BUCKET}
+          aws s3 sync --acl public-read build/ s3://${BUCKET}
+      - name: Invalidate cache
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_DEV }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_DEV }}
+          AWS_REGION: "us-west-1"
+          CLOUDFRONT_ID: "E2YU023QM2FW9X"
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --path "/*"
+          
           
