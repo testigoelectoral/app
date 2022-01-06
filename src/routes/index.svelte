@@ -21,6 +21,9 @@
     <button on:click="{signIn}">Ingresar/Registrarse</button>
 {:else}
     <h2>Bienvenido {user.name}!</h2>
-	<p>Apareces identificado con CC {user.username} y tu email ({user.email}) ha sido verificado: {user.email_verified}</p>
+	<p>Apareces identificado con CC{user.username}</p>
+    <p>Tu email ({user.email}) ha sido verificado: {user.email_verified}</p>
+    <p>Tu telefono ({user.phone_number}) ha sido verificado: {user.phone_number_verified}</p>
+    <p>Tu hash es: {user['custom:hash']}</p>
     <button on:click={signOut}>Salir</button>
 {/if}
