@@ -14,7 +14,7 @@ jobs:
       - name: Build
         env:
           VITE_COGNITO_DOMAIN: https://users-dev.testigoelectoral.org
-          VITE_COGNITO_CLIENT_ID: 7klnfm6laerioopp6hnnd74853
+          VITE_COGNITO_CLIENT_ID: 5vms0oderjuftnfdvgtbhrrjte
         run: |
           env|grep "^VITE_" > .env
           npm run build
