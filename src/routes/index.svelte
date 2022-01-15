@@ -1,11 +1,14 @@
 <script>
     import { signOut as authSignOut } from 'sk-auth/client';
 	import { session } from '$app/stores';
+    //import { appAuth } from '$lib/auth';
+    //const { get, post } = appAuth;
 
     $: user = $session.user;
 
     function signIn() {
         location.assign('/api/auth/signin/cognito?redirect=/');
+        //appAuth.get
     }
 
     function signOut() {
@@ -16,6 +19,8 @@
 <svelte:head>
 	<title>Testigo Electoral</title>
 </svelte:head>
+
+<h1>Testigo Electoral</h1>
 
 {#if !user}
     <button on:click="{signIn}">Ingresar/Registrarse</button>

@@ -14,5 +14,5 @@ const oauthProvider = new Providers.OAuth2Provider(config);
 
 // exposing our auth object
 export const appAuth = new SvelteKitAuth({
-	providers: [oauthProvider]
+	providers: [oauthProvider],
 });
