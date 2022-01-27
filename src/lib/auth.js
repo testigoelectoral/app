@@ -1,16 +1,19 @@
+import { writable } from 'svelte/store';
+export const user = writable();
+
 export const config = {
 	accessTokenUrl: `${import.meta.env.VITE_COGNITO_DOMAIN}/oauth2/token`,
 	authorizationUrl: `${import.meta.env.VITE_COGNITO_DOMAIN}/oauth2/authorize`,
 	profileUrl: `${import.meta.env.VITE_COGNITO_DOMAIN}/oauth2/userInfo`,
 	clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
 	scope: ['openid'].join(','),
-	contentType: 'application/x-www-form-urlencoded',
+	contentType: 'application/x-www-form-urlencoded'
 };
 
 export async function signOut() {
-	localStorage.removeItem("id_token");
-	localStorage.removeItem("access_token");
-	return getProfile()
+	localStorage.removeItem('id_token');
+	localStorage.removeItem('access_token');
+	return getProfile();
 }
 
 export function signIn() {
@@ -26,7 +29,7 @@ export function signIn() {
 	);
 }
 
-function parseHash(hash){
+function parseHash(hash) {
 	return JSON.parse(
 		'{"' + hash.replace(/#/g, '').replace(/&/g, '","').replace(/=/g, '":"') + '"}',
 		function (key, value) {
@@ -35,36 +38,39 @@ function parseHash(hash){
 	);
 }
 
-async function parseJwt (token) {
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+async function parseJwt(token) {
+	var base64Url = token.split('.')[1];
+	var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+	var jsonPayload = decodeURIComponent(
+		atob(base64)
+			.split('')
+			.map(function (c) {
+				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+			})
+			.join('')
+	);
 
-    return JSON.parse(jsonPayload);
-};
+	return JSON.parse(jsonPayload);
+}
 
 export async function getProfile() {
 	let hash = window.location.hash;
 	if (hash) {
 		try {
 			let tokens = parseHash(hash);
-			localStorage.setItem("id_token",tokens.id_token);
-			localStorage.setItem("access_token",tokens.access_token);
-			window.history.replaceState({}, document.title, "/");
-			return  await parseJwt(tokens.id_token);
+			localStorage.setItem('id_token', tokens.id_token);
+			localStorage.setItem('access_token', tokens.access_token);
+			window.history.replaceState({}, document.title, '/');
+			user.set(await parseJwt(tokens.id_token));
 		} catch (error) {
-			return {};
+			user.set(false);
+		}
+	} else {
+		let token_id = localStorage.getItem('id_token');
+		if (token_id) {
+			user.set(await parseJwt(token_id));
+		} else {
+			user.set(false);
 		}
 	}
-	else {
-		let token_id = localStorage.getItem("id_token");
-		if (token_id) {
-			return  await parseJwt(token_id);
-		}
-		else{
-			return {};
-		}
-	};
 }
