@@ -1,84 +1,53 @@
 <script>
-	import { signIn, getProfile, signOut } from '$lib/auth';
+	import { onMount } from 'svelte';
+	import { getProfile, signOut, user,signIn } from '$lib/auth';
 
-	let profile = getProfile();
-
-	function clickLogout() {
-		profile = signOut();
-	}
+	onMount(() => {
+		getProfile();
+	});
 </script>
 
-<div class="row justify-content-md-center">
-	<div class="col-md-6">
-		{#await profile}
-			<div class="d-flex justify-content-center">
-				<div class="spinner-border" role="status">
-					<span class="visually-hidden">Cargando...</span>
-				</div>
-			</div>
-		{:then user}
-			{#if !user.name}
-				<div class="card card-cover h-100 overflow-hidden rounded-5 shadow-lg">
-					<div class="card-body">
-						<h5 class="card-title">Iniciar Sesión</h5>
-						<p class="card-text">Tengo unas palabras para decir pero no me animo.</p>
-						<div class="d-grid gap-2">
-							<button href="#" class="btn btn-primary" on:click={signIn}>
-								Ingresar/Registrarse
-							</button>
-						</div>
-					</div>
-				</div>
-			{:else}
-				<div class="card card-cover h-100 overflow-hidden rounded-5 shadow-lg">
-					<div class="card-body">
-						<h5 class="card-title">Bienvenido {user.name}!</h5>
+<svelte:head>
+	<title>Testigo Electoral</title>
+</svelte:head>
 
-						<ul class="list-group">
-							<li class="list-group-item d-flex justify-content-between align-items-start">
-								<div class="ms-2 me-auto text-truncate">
-									<div class="fw-bold">Apareces identificado con</div>
-									CC {user['cognito:username']}
-								</div>
-							</li>
-							<li class="list-group-item d-flex justify-content-between align-items-start">
-								<div class="ms-2 me-auto text-truncate">
-									<div class="fw-bold">Tu email</div>
-									{user.email}
-								</div>
-								{#if user.email_verified}
-									<span class="badge bg-success rounded-pill">OK</span>
-								{:else}
-									<span class="badge bg-danger rounded-pill">NO</span>
-								{/if}
-							</li>
-							<li class="list-group-item d-flex justify-content-between align-items-start">
-								<div class="ms-2 me-auto text-truncate">
-									<div class="fw-bold">Tu telefono</div>
-									{user.phone_number}
-								</div>
-								{#if user.phone_number_verified}
-									<span class="badge bg-success rounded-pill">OK</span>
-								{:else}
-									<span class="badge bg-danger rounded-pill">NO</span>
-								{/if}
-							</li>
-							<li class="list-group-item d-flex justify-content-between align-items-start">
-								<div class="ms-2 me-auto text-truncate">
-									<div class="fw-bold">Tu hash es</div>
-									{user['custom:hash']}
-								</div>
-							</li>
-						</ul>
-
-						<div class="d-grid gap-2 mt-3">
-							<button href="#" class="btn btn-primary" on:click={clickLogout}> Salir </button>
-						</div>
-					</div>
-				</div>
-			{/if}
-		{:catch error}
-			<p style="color: red">{error.message}</p>
-		{/await}
+<div class="d-flex flex-wrap">
+	<a href="/" class="link-dark text-center m-2 py-3 bg-light rounded">
+		<i class="bi-house-fill" />
+		<div class="mt-2">Inicio</div>
+	</a>
+	{#if $user?.name}
+		<a href="/upload" class="link-dark text-center m-2 py-3 bg-light rounded">
+			<i class="bi-image" />
+			<div class="mt-2">Subir Imagen</div>
+		</a>
+		<a href="/" class="link-dark text-center m-2 py-3 bg-light rounded">
+			<i class="bi-images" />
+			<div class="mt-2">Mis Imágenes</div>
+		</a>
+		<a href="/account" class="link-dark text-center m-2 py-3 bg-light rounded">
+			<i class="bi-person-bounding-box" />
+			<div class="mt-2">Mi Cuenta</div>
+		</a>
+		<div class="a link-dark text-center m-2 py-3 bg-light rounded" on:click={signOut}>
+			<i class="bi-box-arrow-right" />
+			<div class="mt-2">Salir</div>
+		</div>
+	{:else}
+	<div class="a link-dark text-center m-2 py-3 bg-light rounded" on:click={signIn}>
+		<i class="bi-box-arrow-in-right" />
+		<div class="mt-2">Iniciar Sesión/Registro</div>
 	</div>
+
+	{/if}
 </div>
+
+<style>
+	a,
+	.a {
+		width: 170px;
+	}
+	i {
+		font-size: 3em;
+	}
+</style>
