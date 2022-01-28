@@ -38,7 +38,7 @@ function parseHash(hash) {
 	);
 }
 
-async function parseJwt(token) {
+function parseJwt(token) {
 	var base64Url = token.split('.')[1];
 	var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
 	var jsonPayload = decodeURIComponent(
@@ -49,7 +49,6 @@ async function parseJwt(token) {
 			})
 			.join('')
 	);
-
 	return JSON.parse(jsonPayload);
 }
 
@@ -61,14 +60,20 @@ export async function getProfile() {
 			localStorage.setItem('id_token', tokens.id_token);
 			localStorage.setItem('access_token', tokens.access_token);
 			window.history.replaceState({}, document.title, '/');
-			user.set(await parseJwt(tokens.id_token));
+			user.set(parseJwt(tokens.id_token));
 		} catch (error) {
 			user.set(false);
 		}
 	} else {
 		let token_id = localStorage.getItem('id_token');
 		if (token_id) {
-			user.set(await parseJwt(token_id));
+			let data = parseJwt(token_id)
+			if (data.exp*1000 < Date.now()){
+				localStorage.removeItem('id_token');
+				localStorage.removeItem('access_token');
+				user.set(false);	
+			}
+			user.set(data);
 		} else {
 			user.set(false);
 		}
