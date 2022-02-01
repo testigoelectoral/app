@@ -67,15 +67,19 @@ export async function getProfile() {
 	} else {
 		let token_id = localStorage.getItem('id_token');
 		if (token_id) {
-			let data = parseJwt(token_id)
-			if (data.exp*1000 < Date.now()){
+			let data = parseJwt(token_id);
+			if (data.exp * 1000 < Date.now()) {
 				localStorage.removeItem('id_token');
 				localStorage.removeItem('access_token');
-				user.set(false);	
+				user.set(false);
 			}
 			user.set(data);
 		} else {
 			user.set(false);
 		}
 	}
+}
+
+export function toLogin() {
+	window.location.href = '/';
 }
