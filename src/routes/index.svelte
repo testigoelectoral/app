@@ -1,10 +1,27 @@
 <script>
 	import { onMount } from 'svelte';
-	import { getProfile, signOut, user, signIn } from '$lib/auth';
+	import { getProfile, signOut, user, signIn } from '$lib/user';
 
 	onMount(() => {
 		getProfile();
 	});
+
+    let promise;
+    let disabled = false;
+    let usr;
+    let pwd;
+
+    function handleClick() {
+        promise = signIn(usr,pwd);
+        disabled = true;
+	}
+
+	// From https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_InitiateAuth.html
+	let login_errors = {
+		"NotAuthorizedException": "C.C. o contraseña inválidos",
+		"TooManyRequestsException": "Muchos intentos de ingreso, desabilitado temporalmente"
+	}
+
 </script>
 
 <svelte:head>
@@ -12,10 +29,6 @@
 </svelte:head>
 
 <div class="d-flex flex-wrap justify-content-md-center">
-	<a href="/" class="link-dark text-center m-2 py-3 bg-light rounded">
-		<i class="bi-house-fill" />
-		<div class="mt-2">Inicio</div>
-	</a>
 	{#if $user}
 		<a href="/upload" class="link-dark text-center m-2 py-3 bg-light rounded">
 			<i class="bi-image" />
@@ -34,10 +47,23 @@
 			<div class="mt-2">Salir</div>
 		</div>
 	{:else}
-		<div class="a link-dark text-center m-2 py-3 bg-light rounded" on:click={signIn}>
-			<i class="bi-box-arrow-in-right" />
-			<div class="mt-2">Iniciar Sesión/Registro</div>
-		</div>
+		<div class="link-dark text-center m-2 py-3 bg-light rounded" on:click={signOut}>
+			C.C. :<input bind:value={usr} />
+			Contraseña: <input type="password" bind:value={pwd} />
+			<button on:click={ handleClick } { disabled } >Ingresar</button>
+			{#await promise}
+				<p>...Ingresando</p>
+			{:catch error}
+				{#if error.message == "UserNotConfirmedException"}
+				<p style="color: red">Usuario no confirmado, ingrese a <a href="/confirm">confirmar</a> para poder de ingresar.</p>
+				{/if}
+				<p style="color: red">{login_errors[error.message]}</p>
+			{/await}
+			</div>
+		<a href="/signup" class="link-dark text-center m-2 py-3 bg-light rounded">
+			<i class="bi-person-plus-fill" />
+			<div class="mt-2">Crear Cuenta</div>
+		</a>
 	{/if}
 </div>
 

@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { user, getProfile, signOut } from '$lib/auth';
+	import { user, getProfile, signOut } from '$lib/user';
 
 	onMount(() => {
 		getProfile();
