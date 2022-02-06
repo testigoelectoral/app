@@ -13,8 +13,7 @@ jobs:
         run: npm install
       - name: Build
         env:
-          VITE_COGNITO_DOMAIN: https://users-dev.testigoelectoral.org
-          VITE_COGNITO_CLIENT_ID: 5vms0oderjuftnfdvgtbhrrjte
+          VITE_API_DOMAIN: https://api-dev.testigoelectoral.org
         run: |
           env|grep "^VITE_" > .env
           npm run build

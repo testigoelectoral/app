@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { getProfile, user, toLogin } from '$lib/auth';
+	import { getProfile, user, toLogin } from '$lib/user';
 	import { loadJS } from '$lib/store';
 
 	let errorMsg, location;
