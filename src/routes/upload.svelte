@@ -47,6 +47,7 @@
 		QrScanner.scanImage(imageRaw, { returnDetailedScanResult: true })
 			.then((result) => {
 				filesQr[i] = result.data;
+				console.log(result.data);
 			})
 			.catch((e) => {
 				console.log(e);
@@ -146,7 +147,7 @@
 				multiple="true"
 				class="form-control mt-2"
 				type="file"
-				accept=".jpg, .jpeg, .png"
+				accept=".jpg, .jpeg, .png, .webp"
 				on:change={(e) => onFileSelected(e)}
 				bind:this={fileinput}
 			/>
