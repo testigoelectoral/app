@@ -1,7 +1,7 @@
 export default class Api {
-  private url = 'https://api-dev.testigoelectoral.org/'
+	private url = 'https://api-dev.testigoelectoral.org/';
 	private toLogin() {
-		window.location.href = '/';
+		//window.location.href = '/';
 	}
 
 	private async get(path: string): Promise<any> {
@@ -20,6 +20,22 @@ export default class Api {
 			throw new Error(JSON.stringify(body.values || [body]));
 		}
 		return body;
+	}
+	private async getRaw(path: string): Promise<any> {
+		const res = await fetch(path, {
+			method: 'get',
+			headers: {
+				Authorization: `${localStorage.getItem('id_token')}`
+			}
+		});
+		if (res.status === 401) {
+			this.toLogin();
+			return;
+		}
+		var urlCreator = window.URL || window.webkitURL;
+		let blob = await res.blob();
+		var imageUrl = urlCreator.createObjectURL(blob);
+		return imageUrl;
 	}
 	private async post(path: string, bodyObj: any): Promise<any> {
 		const res = await fetch(path, {
@@ -74,7 +90,10 @@ export default class Api {
 		}
 		return body;
 	}
-  async myImages(): Promise<any[]> {
-      return await this.get(`${this.url}myimages`);
-  }
+	async myImages(): Promise<any[]> {
+		return await this.get(`${this.url}myimages`);
+	}
+	async raw(ImageID): Promise<any[]> {
+		return await this.getRaw(`${this.url}myimages/${ImageID}/raw`);
+	}
 }

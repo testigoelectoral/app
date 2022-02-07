@@ -30,6 +30,7 @@
   "type": "module",
   "dependencies": {
     "@sveltejs/adapter-static": "^1.0.0-next.26",
-    "node-sass": "^7.0.1"
+    "node-sass": "^7.0.1",
+    "qr-scanner": "^1.4.0"
   }
 }

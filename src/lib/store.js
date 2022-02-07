@@ -1,8 +1,3 @@
-import { writable } from 'svelte/store';
-
-export const infoExchanges = writable([]);
-export const selectExchange = writable();
-
 function isScriptAlreadyIncluded(url) {
 	var scripts = document.getElementsByTagName('script');
 	for (var i = 0; i < scripts.length; i++) if (scripts[i].getAttribute('src') == url) return true;
