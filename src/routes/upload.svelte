@@ -3,6 +3,7 @@
 	import { writable } from 'svelte/store';
 	import { getProfile, user, toLogin } from '$lib/user';
 	import { loadJS } from '$lib/store';
+	import QrScanner from 'qr-scanner';
 
 	let errorMsg, location;
 
@@ -39,20 +40,36 @@
 	});
 	const preview = writable([]);
 	let files = [];
+	let filesQr = {};
 	let imageRaw, imageContentType, fileinput;
 
+	const scanQr = (imageRaw, i) => {
+		QrScanner.scanImage(imageRaw, { returnDetailedScanResult: true })
+			.then((result) => {
+				filesQr[i] = result.data;
+				console.log(result.data);
+			})
+			.catch((e) => {
+				console.log(e);
+				filesQr[i] = '';
+			});
+	};
+
 	const onFileSelected = (e) => {
-		preview.set([]);
+		let previewT = [];
 		files = e.target.files;
 		for (let i = 0; i < e.target.files.length; i++) {
 			const imageRaw = e.target.files[i];
+			scanQr(imageRaw, i);
 
 			let reader = new FileReader();
 			reader.onload = (e) => {
-				preview.set([...$preview, e.target.result]);
+				previewT[i] = e.target.result;
 			};
 			reader.readAsDataURL(imageRaw);
 		}
+		preview.set(previewT);
+		console.log(files.length);
 	};
 	function uploads() {
 		for (let i = 0; i < files.length; i++) {
@@ -61,30 +78,30 @@
 		}
 	}
 
-	function upload(imageRaw) {
-		const upload = fetch('https://api-dev.testigoelectoral.org/myimages', {
-			method: 'PUT',
-			headers: {
-				'X-Amz-Meta-Accuracy': location.accuracy,
-				'X-Amz-Meta-Latitude': location.latitude,
-				'X-Amz-Meta-Longitude': location.longitude,
-				'X-Amz-Meta-User-Hash': `${$user['custom:hash']}`,
-				'X-Amz-Meta-Qr-Code': '711600102070110113201',
-				'Content-Type': imageRaw.type,
-				Authorization: `${localStorage.getItem('id_token')}`
-			},
-			body: imageRaw
-		})
-			.then(function (response) {
-				if (response.ok) {
-					console.log('Imagen uploaded successfully');
-				} else {
-					console.log("File wasn't uploaded, try again");
-				}
-			})
-			.catch((error) => {
-				console.log('Error:', error);
+	async function upload(imageRaw) {
+		try {
+			let qrcode = await QrScanner.scanImage(imageRaw, { returnDetailedScanResult: true });
+			const response = await fetch('https://api-dev.testigoelectoral.org/myimages', {
+				method: 'PUT',
+				headers: {
+					'X-Amz-Meta-Accuracy': location.accuracy,
+					'X-Amz-Meta-Latitude': location.latitude,
+					'X-Amz-Meta-Longitude': location.longitude,
+					'X-Amz-Meta-User-Hash': `${$user['custom:hash']}`,
+					'X-Amz-Meta-Qr-Code': qrcode.data,
+					'Content-Type': imageRaw.type,
+					Authorization: `${localStorage.getItem('id_token')}`
+				},
+				body: imageRaw
 			});
+			if (response.ok) {
+				console.log('Imagen uploaded successfully');
+			} else {
+				console.log("File wasn't uploaded, try again");
+			}
+		} catch (error) {
+			console.log('Error:', error);
+		}
 	}
 </script>
 
@@ -130,19 +147,31 @@
 				multiple="true"
 				class="form-control mt-2"
 				type="file"
-				accept=".jpg, .jpeg, .png"
+				accept=".jpg, .jpeg, .png, .webp"
 				on:change={(e) => onFileSelected(e)}
 				bind:this={fileinput}
 			/>
 			<div class="d-flex flex-wrap justify-content-md-center">
-				{#each $preview as src}
-					<div class="mt-2 me-2">
-						<img class="img-fluid" {src} alt="d" />
+				{#each $preview as src, i}
+					<div
+						class="mt-2 me-2 px-2 py-2 border-4 rounded {filesQr[i]
+							? 'border border-success'
+							: 'border border-danger'}"
+					>
+						<img class="img-fluid" {src} alt="d" id="img-{i}" />
+						<div class="d-grid mt-2">
+							{#if !filesQr[i]}
+								<div class="btn btn-danger">
+									<i class="bi bi-qr-code" />
+									Error de QR
+								</div>
+							{/if}
+						</div>
 					</div>
 				{/each}
 			</div>
 			<div class="text-center">
-				<button class="btn btn-primary mt-2" disabled={!$preview.length} on:click={uploads}>
+				<button class="btn btn-primary mt-2" disabled={!files.length} on:click={uploads}>
 					<i class="bi bi-cloud-upload" />
 					Subir Imágenes
 				</button>

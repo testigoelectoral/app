@@ -6,30 +6,29 @@
 		getProfile();
 	});
 
-    let promise;
-    let disabled = false;
-    let usr;
-    let pwd;
+	let promise;
+	let disabled = false;
+	let usr;
+	let pwd;
 
-    function handleClick() {
-        promise = signIn(usr,pwd);
-        disabled = true;
+	function handleClick() {
+		promise = signIn(usr, pwd);
+		disabled = true;
+		return false;
 	}
 
 	// From https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_InitiateAuth.html
 	let login_errors = {
-		"NotAuthorizedException": "C.C. o contraseña inválidos",
-		"TooManyRequestsException": "Muchos intentos de ingreso, desabilitado temporalmente"
-	}
-
+		NotAuthorizedException: 'C.C. o contraseña inválidos',
+		TooManyRequestsException: 'Muchos intentos de ingreso, desabilitado temporalmente'
+	};
 </script>
 
 <svelte:head>
 	<title>Testigo Electoral</title>
 </svelte:head>
-
-<div class="d-flex flex-wrap justify-content-md-center">
-	{#if $user}
+{#if $user}
+	<div class="d-flex flex-wrap justify-content-md-center">
 		<a href="/upload" class="link-dark text-center m-2 py-3 bg-light rounded">
 			<i class="bi-image" />
 			<div class="mt-2">Subir Imagen</div>
@@ -46,26 +45,57 @@
 			<i class="bi-box-arrow-right" />
 			<div class="mt-2">Salir</div>
 		</div>
-	{:else}
-		<div class="link-dark text-center m-2 py-3 bg-light rounded" on:click={signOut}>
-			C.C. :<input bind:value={usr} />
-			Contraseña: <input type="password" bind:value={pwd} />
-			<button on:click={ handleClick } { disabled } >Ingresar</button>
-			{#await promise}
-				<p>...Ingresando</p>
-			{:catch error}
-				{#if error.message == "UserNotConfirmedException"}
-				<p style="color: red">Usuario no confirmado, ingrese a <a href="/confirm">confirmar</a> para poder de ingresar.</p>
-				{/if}
-				<p style="color: red">{login_errors[error.message]}</p>
-			{/await}
+	</div>
+{:else}
+	<div class="row justify-content-md-center">
+		<div class="col-md-6">
+			<div class="card card-cover overflow-hidden rounded-5 shadow-lg mt-2">
+				<div class="card-body">
+					<form on:submit|preventDefault={handleClick}>
+						<div class="form-floating mb-3">
+							<input
+								type="text"
+								class="form-control"
+								id="username"
+								bind:value={usr}
+								autocomplete="username"
+							/>
+							<label for="username">C.C.:</label>
+						</div>
+						<div class="form-floating mb-3">
+							<input
+								type="password"
+								class="form-control"
+								id="password"
+								bind:value={pwd}
+								autocomplete="password"
+							/>
+							<label for="password">Contraseña:</label>
+						</div>
+						<button type="submit" class="btn btn-primary mb-3">Ingresar</button>
+					</form>
+					<div>
+						<a href="/signup" class="link-dark"> Crear Cuenta </a>
+					</div>
+					<div>
+						<a href="/recovery" class="link-dark"> ¿Olvidó la contraseña? </a>
+					</div>
+
+					{#await promise}
+						<p>...Ingresando</p>
+					{:catch error}
+						{#if error.message == 'UserNotConfirmedException'}
+							<p style="color: red">
+								Usuario no confirmado, ingrese a <a href="/confirm">confirmar</a> para poder de ingresar.
+							</p>
+						{/if}
+						<p style="color: red">{login_errors[error.message]}</p>
+					{/await}
+				</div>
 			</div>
-		<a href="/signup" class="link-dark text-center m-2 py-3 bg-light rounded">
-			<i class="bi-person-plus-fill" />
-			<div class="mt-2">Crear Cuenta</div>
-		</a>
-	{/if}
-</div>
+		</div>
+	</div>
+{/if}
 
 <style lang="scss">
 	a,
