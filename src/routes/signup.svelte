@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { user, getProfile, signUp } from '$lib/user';
+	import { user, getProfile, signUp } from '$lib/account';
 
 	onMount(() => {
 		getProfile().then(async function () {
@@ -11,9 +11,9 @@
 	});
 
 	let userInfo = {
-		username: '',
-		password: '',
 		email: '',
+		password: '',
+		document: '',
 		name: '',
 		phone: ''
 	};
@@ -31,7 +31,7 @@
 			'Contraseña inválida, asegúrese de que contiene: Mayúsculas, Minúsculas, Números y al menos un caracter especial.',
 		TooManyRequestsException:
 			'Muchos intentos de crecación de cuenta, servicio temporalmente bloqueado.',
-		UsernameExistsException: 'Usuario/Datos ya existentes en el sistema'
+		emailExistsException: 'Usuario/Datos ya existentes en el sistema'
 	};
 </script>
 
@@ -45,13 +45,13 @@
 				<form>
 					<div class="form-floating mb-3">
 						<input
-							type="text"
+							type="email"
 							class="form-control"
-							id="username"
-							bind:value={userInfo.username}
-							autocomplete="username"
+							id="email"
+							bind:value={userInfo.email}
+							autocomplete="email"
 						/>
-						<label for="username">C.C.:</label>
+						<label for="email">Email:</label>
 					</div>
 					<div class="form-floating mb-3">
 						<input
@@ -64,8 +64,8 @@
 						<label for="password">Contraseña:</label>
 					</div>
 					<div class="form-floating mb-3">
-						<input type="email" class="form-control" id="email" bind:value={userInfo.email} />
-						<label for="email">Email:</label>
+						<input type="number" class="form-control" id="document" bind:value={userInfo.document} />
+						<label for="document">C.C.:</label>
 					</div>
 					<div class="form-floating mb-3">
 						<input type="text" class="form-control" id="name" bind:value={userInfo.name} />

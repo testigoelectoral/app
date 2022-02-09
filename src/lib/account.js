@@ -8,14 +8,14 @@ export async function signOut() {
 	return await getProfile();
 }
 
-export async function signIn(usr, pwd) {
-	const signIn_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/user/login`, {
+export async function signIn(email, pwd) {
+	const signIn_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/account/login`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
-			username: usr,
+			email: email,
 			password: pwd
 		})
 	});
@@ -33,7 +33,7 @@ export async function signIn(usr, pwd) {
 }
 
 export async function signUp(userInfo) {
-	const signUp_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/user/signup`, {
+	const signUp_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/account/signup`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -43,7 +43,7 @@ export async function signUp(userInfo) {
 	let data = await signUp_result.json();
 
 	if (signUp_result.ok) {
-		localStorage.setItem('tmp_usr', userInfo.username);
+		localStorage.setItem('tmp_email', userInfo.email);
 		localStorage.setItem('tmp_pwd', userInfo.password);
 		return (window.location.href = '/confirm');
 	} else {
@@ -52,22 +52,22 @@ export async function signUp(userInfo) {
 }
 
 export async function confirm(code) {
-	const confirm_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/user/confirm`, {
+	const confirm_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/account/confirm`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
-			username: localStorage.getItem('tmp_usr'),
+			email: localStorage.getItem('tmp_email'),
 			code: code
 		})
 	});
 	let data = await confirm_result.json();
 
 	if (confirm_result.ok) {
-		let usr = localStorage.getItem('tmp_usr');
+		let usr = localStorage.getItem('tmp_email');
 		let pwd = localStorage.getItem('tmp_pwd');
-		localStorage.removeItem('tmp_usr');
+		localStorage.removeItem('tmp_email');
 		localStorage.removeItem('tmp_pwd');
 		return await signIn(usr, pwd);
 	} else {
@@ -76,13 +76,13 @@ export async function confirm(code) {
 }
 
 export async function resendCode() {
-	const resendCode_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/user/confirm`, {
+	const resendCode_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/account/confirm`, {
 		method: 'PUT',
 		headers: {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
-			username: localStorage.getItem('tmp_usr')
+			email: localStorage.getItem('tmp_email')
 		})
 	});
 	let data = await resendCode_result.json();
@@ -96,7 +96,7 @@ export async function resendCode() {
 }
 
 async function refreshTokens() {
-	const refreshTokens_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/user/token`, {
+	const refreshTokens_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/account/token`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'

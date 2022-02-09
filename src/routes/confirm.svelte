@@ -1,9 +1,9 @@
 <script>
 	import { onMount } from 'svelte';
-	import { user, getProfile, confirm, resendCode } from '$lib/user';
+	import { user, getProfile, confirm, resendCode } from '$lib/account';
 
 	onMount(() => {
-        if (! localStorage.getItem('tmp_usr')){
+        if (! localStorage.getItem('tmp_email')){
             window.location.href = '/';
         }
 		getProfile().then(async function(){

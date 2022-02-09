@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { user, getProfile, signOut } from '$lib/user';
+	import { user, getProfile, signOut } from '$lib/account';
 
 	onMount(() => {
 		getProfile();
@@ -20,7 +20,7 @@
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="ms-2 me-auto text-truncate">
 						<div class="fw-bold">Apareces identificado con</div>
-						CC {$user['cognito:username']}
+						C.C. {$user['custom:document']}
 					</div>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
