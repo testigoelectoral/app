@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { getProfile, user, toLogin } from '$lib/user';
+	import { getProfile, user, toLogin } from '$lib/account';
 	import { loadJS } from '$lib/store';
 	import Api from '$lib/api';
 

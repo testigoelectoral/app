@@ -1,25 +1,23 @@
 <script>
 	import { onMount } from 'svelte';
-	import { getProfile, signOut, user, signIn } from '$lib/user';
+	import { getProfile, signOut, user, signIn } from '$lib/account';
 
 	onMount(() => {
 		getProfile();
 	});
 
 	let promise;
-	let disabled = false;
-	let usr;
+	let email;
 	let pwd;
 
 	function handleClick() {
-		promise = signIn(usr, pwd);
-		disabled = true;
+		promise = signIn(email, pwd);
 		return false;
 	}
 
 	// From https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_InitiateAuth.html
 	let login_errors = {
-		NotAuthorizedException: 'C.C. o contraseña inválidos',
+		NotAuthorizedException: 'email o contraseña inválidos',
 		TooManyRequestsException: 'Muchos intentos de ingreso, desabilitado temporalmente'
 	};
 </script>
@@ -54,13 +52,13 @@
 					<form on:submit|preventDefault={handleClick}>
 						<div class="form-floating mb-3">
 							<input
-								type="text"
+								type="email"
 								class="form-control"
-								id="username"
-								bind:value={usr}
-								autocomplete="username"
+								id="email"
+								bind:value={email}
+								autocomplete="email"
 							/>
-							<label for="username">C.C.:</label>
+							<label for="email">Email:</label>
 						</div>
 						<div class="form-floating mb-3">
 							<input
@@ -86,7 +84,7 @@
 					{:catch error}
 						{#if error.message == 'UserNotConfirmedException'}
 							<p style="color: red">
-								Usuario no confirmado, ingrese a <a href="/confirm">confirmar</a> para poder de ingresar.
+								Usuario no confirmado, ingrese a <a href="/confirm">confirmar</a> para poder ingresar.
 							</p>
 						{/if}
 						<p style="color: red">{login_errors[error.message]}</p>
