@@ -5,7 +5,7 @@ on:
     types: [ labeled ]
 
 jobs:
-  trigger:
+  comment:
     if: github.event.label.name == 'deployment-dev' || github.event.label.name == 'deployment-stage'    
     runs-on: ubuntu-latest
     steps:
@@ -16,8 +16,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr comment ${{github.event.number}} -b "User ${{ github.actor }} Started a deploymen on ${{ github.event.label.name == 'deployment-stage' && 'stage' || 'dev' }}"
-      - name: Merged
-        uses: ./.github/workflows/merge.yml
-        with:
-          target_branch: ${{ github.event.label.name == 'deployment-stage' && 'stage' || 'dev' }}
-          source_branch: ${{ github.ref_name }}
+  trigger:
+    if: github.event.label.name == 'deployment-dev' || github.event.label.name == 'deployment-stage'    
+    uses: ./.github/workflows/merge.yml
+    with:
+      target_branch: ${{ github.event.label.name == 'deployment-stage' && 'stage' || 'dev' }}
+      source_branch: ${{ github.ref_name }}
