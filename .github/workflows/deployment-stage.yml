@@ -1,7 +1,6 @@
 name: Deploy STAGE
-on:
-  push:
-    branches: [ stage ]
+
+on: workflow_call
 
 jobs:
   deployment:

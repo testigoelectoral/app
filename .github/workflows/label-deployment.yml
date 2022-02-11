@@ -14,11 +14,14 @@ jobs:
       - name: Comment
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr comment ${{github.event.number}} -b "User ${{ github.actor }} Started a deployment on ${{ github.event.label.name == 'deployment-stage' && 'stage' || 'dev' }} with branch ${{ github.event.pull_request.head.ref }}"
-  trigger:
-    if: github.event.label.name == 'deployment-dev' || github.event.label.name == 'deployment-stage'    
-    uses: ./.github/workflows/merge.yml
-    with:
-      target_branch: ${{ github.event.label.name == 'deployment-stage' && 'stage' || 'dev' }}
-      source_branch: ${{ github.event.pull_request.head.ref }}
+        run: gh pr comment ${{github.event.number}} -b "User ${{ github.actor }} Started a deployment on ${{ github.event.label.name == 'deployment-stage' && 'stage' || 'dev' }} with branch ${{ github.event.pull_request.head.ref }}"
+      - name: Remove Label
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr edit ${{github.event.number}} --remove-label "${{ github.event.label.name }}"
+  trigger-dev:
+    if: github.event.label.name == 'deployment-dev'
+    uses: ./.github/workflows/deployment-dev.yml
+  trigger-stage:
+    if: github.event.label.name == 'deployment-stage'    
+    uses: ./.github/workflows/deployment-stage.yml

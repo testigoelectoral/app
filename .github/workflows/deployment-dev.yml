@@ -1,7 +1,6 @@
 name: Deploy DEV
-on:
-  push:
-    branches: [ dev ]
+
+on: workflow_call
 
 jobs:
   deployment:
@@ -34,5 +33,3 @@ jobs:
           CLOUDFRONT_ID: "E2YU023QM2FW9X"
         run: |
           aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --path "/*"
-          
-          
