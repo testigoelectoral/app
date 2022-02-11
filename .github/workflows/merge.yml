@@ -1,4 +1,4 @@
-name: Check Stages
+name: Merge for Deployment
 on:
   workflow_call:
     inputs:
