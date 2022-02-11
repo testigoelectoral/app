@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { user, getProfile, confirm, resendCode } from '$lib/account';
+	import { user, getProfile, confirmForgotPassword, resendCode } from '$lib/account';
 
 	onMount(() => {
 		if (!localStorage.getItem('tmp_email')) {
@@ -13,16 +13,11 @@
 		});
 	});
 
-	let code;
+	let code, password;
 
 	let promiseConfirm;
 	function handleConfirm() {
-		promiseConfirm = confirm(code);
-	}
-
-	let promiseCode;
-	function handleResendCode() {
-		promiseCode = resendCode();
+		promiseConfirm = confirmForgotPassword(code, password);
 	}
 
 	// From https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ConfirmSignUp.html#API_ConfirmSignUp_Errors
@@ -33,13 +28,6 @@
 			'Muchos fallos de confirmación de cuenta, servicio temporalmente bloqueado.',
 		TooManyRequestsException:
 			'Muchos intentos de confirmación de cuenta, servicio temporalmente bloqueado.'
-	};
-
-	// From https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ResendConfirmationCode.html#API_ResendConfirmationCode_Errors
-	let resend_errors = {
-		CodeDeliveryFailureException: 'No se pudo enviar el código, intente de nuevo.',
-		UserNotFoundException: 'Usuario no encontrado, regrese a crear cuenta e intente de nuevo.',
-		LimitExceededException: 'Muchos códigos enviados al mismo usuario, bloqueado temporalmente.'
 	};
 </script>
 
@@ -56,11 +44,18 @@
 						<input type="text" class="form-control" id="code" bind:value={code} />
 						<label for="code">Código enviado al correo:</label>
 					</div>
+					<div class="form-floating mb-3">
+						<input
+							type="password"
+							class="form-control"
+							id="password"
+							bind:value={password}
+							autocomplete="new-password"
+						/>
+						<label for="password">Nueva contraseña:</label>
+					</div>
 					<div class="d-grid gap-2">
 						<button type="submit" class="btn btn-primary">Confirmar</button>
-						<button type="button" class="btn btn-warning" on:click={handleResendCode}
-							>Reenviar código</button
-						>
 					</div>
 				</form>
 
@@ -70,19 +65,6 @@
 					<div class="alert alert-danger mt-2">
 						<div>
 							{confirm_errors[JSON.parse(error.message).__type]}
-						</div>
-						<div>
-							{JSON.parse(error.message).message}
-						</div>
-					</div>
-				{/await}
-
-				{#await promiseCode}
-					<div class="alert alert-info mt-2">...Enviando</div>
-				{:catch error}
-					<div class="alert alert-danger mt-2">
-						<div>
-							{resend_errors[JSON.parse(error.message).__type]}
 						</div>
 						<div>
 							{JSON.parse(error.message).message}

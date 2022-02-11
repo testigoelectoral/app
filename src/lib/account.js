@@ -51,6 +51,49 @@ export async function signUp(userInfo) {
 	}
 }
 
+export async function forgotPassword(email) {
+	const result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/account/forgot`, {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ email: email })
+	});
+	let data = await result.json();
+
+	if (result.ok) {
+		console.log(JSON.stringify(data));
+		localStorage.setItem('tmp_email', email);
+		return (window.location.href = '/confirm-forgot');
+	} else {
+		throw new Error(JSON.stringify(data));
+	}
+}
+
+export async function confirmForgotPassword(code, password) {
+	const confirm_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/account/forgot`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			email: localStorage.getItem('tmp_email'),
+			password: password,
+			code: code
+		})
+	});
+	let data = await confirm_result.json();
+
+	if (confirm_result.ok) {
+		let usr = localStorage.getItem('tmp_email');
+		localStorage.removeItem('tmp_email');
+		await signIn(usr, password);
+		return (window.location.href = '/');
+	} else {
+		throw new Error(JSON.stringify(data));
+	}
+}
+
 export async function confirm(code) {
 	const confirm_result = await fetch(`${import.meta.env.VITE_API_DOMAIN}/account/confirm`, {
 		method: 'POST',
@@ -69,7 +112,8 @@ export async function confirm(code) {
 		let pwd = localStorage.getItem('tmp_pwd');
 		localStorage.removeItem('tmp_email');
 		localStorage.removeItem('tmp_pwd');
-		return await signIn(usr, pwd);
+		await signIn(usr, pwd);
+		return (window.location.href = '/');
 	} else {
 		throw new Error(JSON.stringify(data));
 	}

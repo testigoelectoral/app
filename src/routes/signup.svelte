@@ -42,7 +42,7 @@
 	<div class="col-md-6">
 		<div class="card card-cover overflow-hidden rounded-5 shadow-lg mt-2">
 			<div class="card-body">
-				<form>
+				<form on:submit|preventDefault={handleClick}>
 					<div class="form-floating mb-3">
 						<input
 							type="email"
@@ -64,7 +64,12 @@
 						<label for="password">Contraseña:</label>
 					</div>
 					<div class="form-floating mb-3">
-						<input type="number" class="form-control" id="document" bind:value={userInfo.document} />
+						<input
+							type="number"
+							class="form-control"
+							id="document"
+							bind:value={userInfo.document}
+						/>
 						<label for="document">C.C.:</label>
 					</div>
 					<div class="form-floating mb-3">
@@ -72,10 +77,16 @@
 						<label for="name">Nombre:</label>
 					</div>
 					<div class="form-floating mb-3">
-						<input type="text" class="form-control" id="phone" bind:value={userInfo.phone} />
+						<input
+							type="text"
+							class="form-control"
+							id="phone"
+							bind:value={userInfo.phone}
+							placeholder="+573001122333"
+						/>
 						<label for="phone">Número de celular:</label>
 					</div>
-					<button type="submit" class="btn btn-primary" on:click={handleClick}>Crear</button>
+					<button type="submit" class="btn btn-primary">Crear</button>
 				</form>
 				<div>
 					<a href="/" class="link-dark"> Ingresar</a>
@@ -85,10 +96,18 @@
 				</div>
 
 				{#await promise}
-					<p>...Creando</p>
+					<div class="alert alert-info mt-2">...Creando</div>
+				{:then}
+					<div class="alert alert-success mt-2">Finalizado</div>
 				{:catch error}
-					<p style="color: red">{login_errors[JSON.parse(error.message).__type]}</p>
-					<p style="color: blue">{JSON.parse(error.message).message}</p>
+					<div class="alert alert-danger mt-2">
+						<div>
+							{login_errors[JSON.parse(error.message).__type]}
+						</div>
+						<div>
+							{JSON.parse(error.message).message}
+						</div>
+					</div>
 				{/await}
 			</div>
 		</div>
