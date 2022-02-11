@@ -15,7 +15,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment ${{github.event.number}} -b "User ${{ github.actor }} Started a deploymen on ${{ github.event.label.name == 'deployment-stage' && 'stage' || 'dev' }}"
+          gh pr comment ${{github.event.number}} -b "User ${{ github.actor }} Started a deployment on ${{ github.event.label.name == 'deployment-stage' && 'stage' || 'dev' }} with branch ${{ github.ref_name }}"
   trigger:
     if: github.event.label.name == 'deployment-dev' || github.event.label.name == 'deployment-stage'    
     uses: ./.github/workflows/merge.yml

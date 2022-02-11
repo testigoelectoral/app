@@ -19,8 +19,9 @@ jobs:
         with:
           ref: ${{ inputs.target_branch }}
           fetch-depth: 0
-      - name: Reset, Merge & push
-        run: |
-          /usr/bin/git reset --hard origin/main
-          /usr/bin/git merge ${{ inputs.source_branch }}
-          /usr/bin/git push origin ${{ inputs.target_branch }} -f
+      - name: Reset
+        run: /usr/bin/git reset --hard origin/main
+      - name: Merge
+        run: /usr/bin/git merge ${{ inputs.source_branch }}
+      - name: Push
+        run: /usr/bin/git push origin ${{ inputs.target_branch }} -f
