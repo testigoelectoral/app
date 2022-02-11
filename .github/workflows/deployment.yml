@@ -1,0 +1,47 @@
+name: Deployment
+
+on:
+  workflow_call:
+    inputs:
+      AWS_REGION:
+        required: true
+        type: string
+      BUCKET:
+        required: true
+        type: string
+      CLOUDFRONT_ID:
+        required: true
+        type: string
+      API_DOMAIN:
+        required: true
+        type: string
+    secrets:
+      S3_ACCESS:
+        required: true
+      S3_SECRET:
+        required: true
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET }}
+      AWS_REGION: "${{ inputs.AWS_REGION }}"
+      BUCKET: "${{ inputs.BUCKET }}"
+      CLOUDFRONT_ID: "${{ inputs.CLOUDFRONT_ID }}"
+      VITE_API_DOMAIN: "${{ inputs.API_DOMAIN }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install
+        run: npm install
+      - name: Build
+        run: |
+          env|grep "^VITE_" > .env
+          npm run build
+      - name: Publish APP
+        run: |
+          find build -type f -exec gzip -9 {} \; -exec mv {}.gz {} \;
+          aws s3 sync --delete --acl public-read --content-encoding gzip build/ s3://${BUCKET}
+      - name: Invalidate cache
+        run: aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --path "/*"
