@@ -1,0 +1,17 @@
+name: Merged Main
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  trigger-deployment:
+    uses: ./.github/workflows/deployment.yml
+    with:
+      AWS_REGION: "us-east-2"
+      BUCKET: "testigoelectoral-webapp-prod"
+      CLOUDFRONT_ID: "E1QEV7TGARVDS5"
+      API_DOMAIN: "https://api.testigoelectoral.org"
+    secrets:
+      S3_ACCESS_DEV: ${{ secrets.S3_ACCESS_DEV }}
+      S3_SECRET_DEV: ${{ secrets.S3_SECRET_DEV }}
