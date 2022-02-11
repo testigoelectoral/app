@@ -1,0 +1,26 @@
+name: Check Stages
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ labeled ]
+
+jobs:
+  trigger:
+    if: 
+    
+    env:
+      TARGET_BRANCH: ${{ github.event.label.name == 'deployment-stage' && 'stage' || 'dev'}}
+      SOURCE_BRANCH: ${{ github.ref_name }}
+      ACTOR: ${{ github.actor }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{github.event.number}} -b "User ${{ ACTOR }} Started a deploymen on ${{ TARGET_BRANCH }}"
+      - name: Merged
+        uses: ./.github/workflows/merge.yml
+        with:
+          target_branch: ${{ TARGET_BRANCH }}
+          source_branch: ${{ SOURCE_BRANCH }}
