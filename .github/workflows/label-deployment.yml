@@ -28,5 +28,5 @@ jobs:
       CLOUDFRONT_ID: "${{ github.event.label.name == 'deployment-dev' && 'E2YU023QM2FW9X' || 'E2VXTWC7COERGN' }}"
       API_DOMAIN: "${{ github.event.label.name == 'deployment-dev' && 'https://api-dev.testigoelectoral.org' || 'https://api-stage.testigoelectoral.org' }}"
     secrets:
-      S3_ACCESS_DEV: ${{ secrets.S3_ACCESS_DEV }}
-      S3_SECRET_DEV: ${{ secrets.S3_SECRET_DEV }}
+      S3_ACCESS: "${{ github.event.label.name == 'deployment-dev' && secrets.S3_ACCESS_DEV || secrets.S3_ACCESS_STAGE }}"
+      S3_SECRET: "${{ github.event.label.name == 'deployment-dev' && secrets.S3_SECRET_DEV || secrets.S3_SECRET_STAGE }}"
