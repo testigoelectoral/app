@@ -6,8 +6,7 @@ on:
 
 jobs:
   trigger:
-    if: 
-    
+    if: github.event.label.name == 'deployment-dev' || github.event.label.name == 'deployment-stage'    
     env:
       TARGET_BRANCH: ${{ github.event.label.name == 'deployment-stage' && 'stage' || 'dev'}}
       SOURCE_BRANCH: ${{ github.ref_name }}
