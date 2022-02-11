@@ -22,5 +22,5 @@ jobs:
       - name: Reset, Merge & push
         run: |
           /usr/bin/git reset --hard origin/main
-          /usr/bin/git merge ${{ source_branch }}
+          /usr/bin/git merge ${{ inputs.source_branch }}
           /usr/bin/git push origin ${{ inputs.target_branch }} -f
