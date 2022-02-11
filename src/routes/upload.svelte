@@ -41,7 +41,7 @@
 	const preview = writable([]);
 	let files = [];
 	let filesQr = {};
-	let imageRaw, imageContentType, fileinput;
+	let fileinput;
 
 	const scanQr = (imageRaw, i) => {
 		QrScanner.scanImage(imageRaw, { returnDetailedScanResult: true })
@@ -72,10 +72,14 @@
 		console.log(files.length);
 	};
 	function uploads() {
+		let promises = [];
 		for (let i = 0; i < files.length; i++) {
 			const imageRaw = files[i];
-			upload(imageRaw);
+			promises.push(upload(imageRaw));
 		}
+		Promise.all(promises).then((_r) => {
+			window.location.href = '/myimages';
+		});
 	}
 
 	async function upload(imageRaw) {
