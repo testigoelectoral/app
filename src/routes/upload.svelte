@@ -5,6 +5,7 @@
 	import { loadJS } from '$lib/store';
 	import QrScanner from 'qr-scanner';
 	import { puestoFromQR } from '$lib/data'
+	import {API_URL} from '$lib/api'
 
 	let errorMsg, location;
 
@@ -86,7 +87,7 @@
 	async function upload(imageRaw) {
 		try {
 			let qrcode = await QrScanner.scanImage(imageRaw, { returnDetailedScanResult: true });
-			const response = await fetch('https://api-dev.testigoelectoral.org/myimages', {
+			const response = await fetch(API_URL+"/myimages", {
 				method: 'PUT',
 				headers: {
 					'X-Amz-Meta-Accuracy': location.accuracy,
