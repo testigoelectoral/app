@@ -4,6 +4,7 @@
 	import { getProfile, user, toLogin } from '$lib/account';
 	import { loadJS } from '$lib/store';
 	import QrScanner from 'qr-scanner';
+	import { puestoFromQR } from '$lib/data'
 
 	let errorMsg, location;
 
@@ -41,13 +42,13 @@
 	const preview = writable([]);
 	let files = [];
 	let filesQr = {};
-	let fileinput;
+	let imageData = {};
 
 	const scanQr = (imageRaw, i) => {
 		QrScanner.scanImage(imageRaw, { returnDetailedScanResult: true })
 			.then((result) => {
 				filesQr[i] = result.data;
-				console.log(result.data);
+				imageData[i] = puestoFromQR(result.data);
 			})
 			.catch((e) => {
 				console.log(e);
@@ -153,7 +154,6 @@
 				type="file"
 				accept=".jpg, .jpeg, .png, .webp"
 				on:change={(e) => onFileSelected(e)}
-				bind:this={fileinput}
 			/>
 			<div class="d-flex flex-wrap justify-content-md-center">
 				{#each $preview as src, i}
@@ -164,12 +164,19 @@
 					>
 						<img class="img-fluid" {src} alt="d" id="img-{i}" />
 						<div class="d-grid mt-2">
-							{#if !filesQr[i]}
-								<div class="btn btn-danger">
-									<i class="bi bi-qr-code" />
-									Error de QR
-								</div>
-							{/if}
+						{#if !filesQr[i]}
+							<div class="btn btn-danger">
+								<i class="bi bi-qr-code" />
+								Error de QR
+							</div>
+						{:else}
+							<div class="btn btn-info">
+								Departamento: ({imageData[i].StateCode}) {imageData[i].StateName}<br/>
+								Municipio/Zona: ({imageData[i].MunicipalityCode}) {imageData[i].MunicipalityName} / {imageData[i].ZoneCode}<br/>
+								Puesto: ({imageData[i].PlaceCode}) {imageData[i].PlaceName}<br/>
+								Tipo/Mesa/Pagina: {#if imageData[i].PageType == "71"}Senado{:else}Camara{/if} / {imageData[i].Table} / {imageData[i].PageNumber}<br/>
+							</div>
+						{/if}
 						</div>
 					</div>
 				{/each}
