@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { getProfile, user, toLogin } from '$lib/account';
-	import {Api} from '$lib/api'
+	import Api from '$lib/api'
 
 	let promise = Promise.resolve([]);
 	let api;

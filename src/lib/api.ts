@@ -1,27 +1,56 @@
-export const API_URL = import.meta.env.VITE_API_DOMAIN;
 
-export class Api {
-	private async get(path: string): Promise<any> {
-		const res = await fetch(API_URL+path, {
-			method: 'get',
-			headers: {
-				Authorization: `${localStorage.getItem('id_token')}`
-			}
-		});
-		const body = await res.json();
-
-		if (!res.ok){
-			throw new Error(JSON.stringify(body.values || [body]));
+export default class Api {
+	private API_URL = import.meta.env.VITE_API_DOMAIN;
+	async upload(location:any,qrcode: string,userHash: string,imageRaw: any): Promise<any[]> {
+		let headers = {
+			'X-Amz-Meta-Accuracy': location.accuracy,
+			'X-Amz-Meta-Latitude': location.latitude,
+			'X-Amz-Meta-Longitude': location.longitude,
+			'X-Amz-Meta-User-Hash': userHash,
+			'X-Amz-Meta-Qr-Code': qrcode,
+			'Content-Type': imageRaw.type,
 		}
-
-		return body;
+		return this.put("/myimages",headers,imageRaw);
 	}
 
 	async myImages(): Promise<any[]> {
 		let res = await this.get("/myimages");
-		res.forEach(function(value,index){
-			res[index].url = API_URL + "/images/" + value.ImageID;
+		const apiurl = this.API_URL;
+		res.forEach(function(value: any,index: number){
+			res[index].url = apiurl + "/images/" + value.ImageID;
 		});
 		return res;
+	}
+
+	private async put(path: string,headers:any={},body:any=undefined): Promise<any> {
+		return await this.call("put",path,headers,body);
+	}
+
+	private async get(path: string,headers:any={}): Promise<any> {
+		return await this.call("get",path,headers);
+	}
+
+	private async call(method:string, path: string,headers:any={}, bodyRequest:any=undefined): Promise<any>{
+		let fetchOptions = {
+			method: method,
+			headers:headers
+		};
+
+		fetchOptions.headers["Authorization"]=localStorage.getItem('id_token');
+
+		if(bodyRequest){
+			fetchOptions["body"]=bodyRequest;
+		}
+
+		const res = await fetch(this.API_URL+path, fetchOptions);
+
+		const string = await res.text();
+		const json = string === "" ? {} : JSON.parse(string); // Fix for empty body responses
+
+		if (!res.ok){
+			throw new Error(JSON.stringify(json));
+		}
+
+		return json;
 	}
 }
