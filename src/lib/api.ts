@@ -1,99 +1,56 @@
+
 export default class Api {
-	private url = 'https://api-dev.testigoelectoral.org/';
-	private toLogin() {
-		//window.location.href = '/';
+	private API_URL = import.meta.env.VITE_API_DOMAIN;
+	async upload(location:any,qrcode: string,userHash: string,imageRaw: any): Promise<any[]> {
+		let headers = {
+			'X-Amz-Meta-Accuracy': location.accuracy,
+			'X-Amz-Meta-Latitude': location.latitude,
+			'X-Amz-Meta-Longitude': location.longitude,
+			'X-Amz-Meta-User-Hash': userHash,
+			'X-Amz-Meta-Qr-Code': qrcode,
+			'Content-Type': imageRaw.type,
+		}
+		return this.put("/myimages",headers,imageRaw);
 	}
 
-	private async get(path: string): Promise<any> {
-		const res = await fetch(path, {
-			method: 'get',
-			headers: {
-				Authorization: `${localStorage.getItem('id_token')}`
-			}
-		});
-		if (res.status === 401) {
-			this.toLogin();
-			return;
-		}
-		const body = await res.json();
-		if ([200, 201, 202].indexOf(res.status) === -1) {
-			throw new Error(JSON.stringify(body.values || [body]));
-		}
-		return body;
-	}
-	private async getRaw(path: string): Promise<any> {
-		const res = await fetch(path, {
-			method: 'get',
-			headers: {
-				Authorization: `${localStorage.getItem('id_token')}`
-			}
-		});
-		if (res.status === 401) {
-			this.toLogin();
-			return;
-		}
-		var urlCreator = window.URL || window.webkitURL;
-		let blob = await res.blob();
-		var imageUrl = urlCreator.createObjectURL(blob);
-		return imageUrl;
-	}
-	private async post(path: string, bodyObj: any): Promise<any> {
-		const res = await fetch(path, {
-			method: 'post',
-			headers: {
-				Authorization: `${localStorage.getItem('id_token')}`
-			},
-			body: JSON.stringify(bodyObj)
-		});
-		if (res.status === 401) {
-			this.toLogin();
-			return;
-		}
-		const body = await res.json();
-		if ([200, 201, 202].indexOf(res.status) === -1) {
-			throw new Error(JSON.stringify(body.values || [body]));
-		}
-		return body;
-	}
-	private async put(path: string, bodyObj: any): Promise<any> {
-		const res = await fetch(path, {
-			method: 'put',
-			headers: {
-				Authorization: `${localStorage.getItem('id_token')}`
-			},
-			body: JSON.stringify(bodyObj)
-		});
-		if (res.status === 401) {
-			this.toLogin();
-			return;
-		}
-		const body = await res.json();
-		if ([200, 201, 202].indexOf(res.status) === -1) {
-			throw new Error(JSON.stringify(body.values || [body]));
-		}
-		return body;
-	}
-	private async delete(path: string): Promise<any> {
-		const res = await fetch(path, {
-			method: 'delete',
-			headers: {
-				Authorization: `${localStorage.getItem('id_token')}`
-			}
-		});
-		if (res.status === 401) {
-			this.toLogin();
-			return;
-		}
-		const body = await res.json();
-		if ([200, 201, 202].indexOf(res.status) === -1) {
-			throw new Error(JSON.stringify(body.values));
-		}
-		return body;
-	}
 	async myImages(): Promise<any[]> {
-		return await this.get(`${this.url}myimages`);
+		let res = await this.get("/myimages");
+		const apiurl = this.API_URL;
+		res.forEach(function(value: any,index: number){
+			res[index].url = apiurl + "/images/" + value.ImageID;
+		});
+		return res;
 	}
-	async raw(ImageID): Promise<any[]> {
-		return await this.getRaw(`${this.url}myimages/${ImageID}/raw`);
+
+	private async put(path: string,headers:any={},body:any=undefined): Promise<any> {
+		return await this.call("put",path,headers,body);
+	}
+
+	private async get(path: string,headers:any={}): Promise<any> {
+		return await this.call("get",path,headers);
+	}
+
+	private async call(method:string, path: string,headers:any={}, bodyRequest:any=undefined): Promise<any>{
+		let fetchOptions = {
+			method: method,
+			headers:headers
+		};
+
+		fetchOptions.headers["Authorization"]=localStorage.getItem('id_token');
+
+		if(bodyRequest){
+			fetchOptions["body"]=bodyRequest;
+		}
+
+		const res = await fetch(this.API_URL+path, fetchOptions);
+
+		const string = await res.text();
+		const json = string === "" ? {} : JSON.parse(string); // Fix for empty body responses
+
+		if (!res.ok){
+			throw new Error(JSON.stringify(json));
+		}
+
+		return json;
 	}
 }

@@ -5,13 +5,17 @@
 	import { loadJS } from '$lib/store';
 	import QrScanner from 'qr-scanner';
 	import { puestoFromQR } from '$lib/data'
+	import Api from '$lib/api'
 
 	let errorMsg, location;
+	let api;
+
 
 	onMount(async () => {
 		await getProfile();
 		if (!$user) toLogin();
 
+		api = new Api();
 		let geoModal, id;
 		let options = {
 			enableHighAccuracy: false,
@@ -76,37 +80,11 @@
 		let promises = [];
 		for (let i = 0; i < files.length; i++) {
 			const imageRaw = files[i];
-			promises.push(upload(imageRaw));
+			promises.push(api.upload(location,filesQr[i],`${$user['custom:hash']}`,imageRaw));
 		}
 		Promise.all(promises).then((_r) => {
 			window.location.href = '/myimages';
 		});
-	}
-
-	async function upload(imageRaw) {
-		try {
-			let qrcode = await QrScanner.scanImage(imageRaw, { returnDetailedScanResult: true });
-			const response = await fetch('https://api-dev.testigoelectoral.org/myimages', {
-				method: 'PUT',
-				headers: {
-					'X-Amz-Meta-Accuracy': location.accuracy,
-					'X-Amz-Meta-Latitude': location.latitude,
-					'X-Amz-Meta-Longitude': location.longitude,
-					'X-Amz-Meta-User-Hash': `${$user['custom:hash']}`,
-					'X-Amz-Meta-Qr-Code': qrcode.data,
-					'Content-Type': imageRaw.type,
-					Authorization: `${localStorage.getItem('id_token')}`
-				},
-				body: imageRaw
-			});
-			if (response.ok) {
-				console.log('Imagen uploaded successfully');
-			} else {
-				console.log("File wasn't uploaded, try again");
-			}
-		} catch (error) {
-			console.log('Error:', error);
-		}
 	}
 </script>
 
