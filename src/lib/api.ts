@@ -1,6 +1,7 @@
 
 export default class Api {
 	private API_URL = import.meta.env.VITE_API_DOMAIN;
+
 	async upload(location:any,qrcode: string,userHash: string,imageRaw: any): Promise<any[]> {
 		let headers = {
 			'X-Amz-Meta-Accuracy': location.accuracy,
@@ -11,6 +12,24 @@ export default class Api {
 			'Content-Type': imageRaw.type,
 		}
 		return this.put("/myimages",headers,imageRaw);
+	}
+
+	async image(imageid:string): Promise<any> {
+		let info = await this.get("/myimages/"+imageid);
+		let votes = await this.get("/myimages/"+imageid+"/votes");
+		return {
+			"info":info,
+			"votes": votes[0] ? votes[0].Votes : {},
+			"url":  this.API_URL + "/images/" + imageid
+		};
+	}
+
+	async report(imageid:string,votes:any): Promise<any> {
+		return await this.put(
+			"/myimages/"+imageid+"/votes",
+			{'Content-Type': 'application/json'},
+			{votes:votes}
+		);
 	}
 
 	async myImages(): Promise<any[]> {
@@ -39,7 +58,12 @@ export default class Api {
 		fetchOptions.headers["Authorization"]=localStorage.getItem('id_token');
 
 		if(bodyRequest){
-			fetchOptions["body"]=bodyRequest;
+			if (headers['Content-Type'] == 'application/json'){
+				fetchOptions["body"]=JSON.stringify(bodyRequest);
+
+			}else{
+				fetchOptions["body"]=bodyRequest;
+			}			
 		}
 
 		const res = await fetch(this.API_URL+path, fetchOptions);
@@ -50,7 +74,7 @@ export default class Api {
 		if (!res.ok){
 			throw new Error(JSON.stringify(json));
 		}
-
+		// console.log(json);
 		return json;
 	}
 }

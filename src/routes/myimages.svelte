@@ -28,7 +28,14 @@
 				{:then images}
 					{#each images as image}
 						<div class="mt-2 me-2">
-							<img class="img-fluid" alt="img" src="{image.url}" />
+							<a href="/image/{image.ImageID}" class="link-dark text-center m-2 py-3 bg-light rounded">
+								<img class="img-fluid" alt="img" src="{image.url}" />
+								{#if !image.OwnerReport}
+									<div class="mt-2">Votar</div>
+								{:else}
+									<div class="mt-2">Revisar</div>
+								{/if}
+							</a>
 						</div>
 					{/each}
 				{:catch error}

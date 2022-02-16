@@ -1,0 +1,91 @@
+<script>
+  import {candidatosCamara, candidatosSenado, partidosCamara, partidosSenado} from '$lib/data'
+
+  export let votes = {};
+  export let TypeCode;
+  export let StateCode;
+
+  
+  let partido=null;
+  let candidato=null;
+  let votesCandidate=null;
+
+
+  let partidos = TypeCode==71 ? partidosCamara(StateCode) : partidosSenado();
+
+  function updateCandidatos(partido){
+    const opcionesMesa = ["VOTOS EN BLANCO","VOTOS NO MARCADOS","VOTOS NULOS"]
+    if (!partido) {
+      return [];
+    }
+
+    if (partido=="DATOS MESA") {
+      return opcionesMesa;
+    }
+
+    if (TypeCode==71) {
+      return ["VOTOS PARA LA LISTA"].concat(candidatosCamara(StateCode,partido))
+    }else{
+      return ["VOTOS PARA LA LISTA"].concat(candidatosSenado(StateCode,partido))
+    }
+  }
+ 
+  $: candidatos = updateCandidatos(partido);
+
+  function handleAdd() {
+		votes[partido+"|"+candidato]=votesCandidate;
+	}
+
+  function onChangePartido() {
+    candidato=null;
+    votesCandidate=null
+  }
+
+  function onChangeCandidato() {
+    votesCandidate=null
+  }
+
+</script>
+<form on:submit|preventDefault={handleAdd} >
+    <div class="form-floating mb-3">
+      <select
+          type="select"
+          class="form-control"
+          id="partido"
+          bind:value={partido}
+          on:change={onChangePartido} >
+        <option value=null selected disabled>Seleccione un partido</option>
+        <option value="DATOS MESA">DATOS MESA</option>
+        {#each partidos as p}
+          <option value="{p}">{p}</option>
+        {/each}
+      </select>
+      <label for="Partido">Partido:</label>
+    </div>
+    <div class="form-floating mb-3">
+      <select
+          type="select"
+          class="form-control"
+          id="candidato"
+          bind:value={candidato}
+          disabled={!partido} 
+          on:change={onChangeCandidato} >
+        <option value=null selected disabled>Seleccione un candidato</option>
+        {#each candidatos as c}
+          <option value="{c}">{c}</option>
+        {/each}
+      </select>
+      <label for="Candidato">Candidato:</label>
+  </div>
+  <div class="form-floating mb-3">
+        <input
+            type="number"
+            class="form-control"
+            id="votos"
+            bind:value={votesCandidate}
+            disabled={!candidato} 
+        />
+        <label for="votos">Votos:</label>
+    </div>
+    <button type="submit" class="btn btn-primary" disabled={!votesCandidate} >Agregar</button>
+</form>

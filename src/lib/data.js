@@ -39,19 +39,41 @@ export function puestoFromQR(qrcode){
     }
 }
 
-export async function partidosCamara(StateCode){
-    return PartidosCamara.departamentos[StateCode];
+export function puestoFromImageInfo(imageinfo){
+    qrcode = 
+        String(imageinfo.TypeCode) + 
+        String(imageinfo.StateCode).padStart(2, '0') +
+        String(imageinfo.MunicipalityCode).padStart(3, '0') +
+        String(imageinfo.ZoneCode).padStart(2, '0') +
+        String(imageinfo.PlaceCode).padStart(2, '0') +
+        String(imageinfo.Table).padStart(3, '0') +
+        String(imageinfo.PageNumber).padStart(2, '0') +
+        "00000";
+
+    return puestoFromQR(qrcode)
 }
 
-export async function candidatosCamara(StateCode,partido){
-    return CandidatosCamara.departamentos[StateCode][partido];
+export function partidosCamara(StateCode){
+    if (PartidosCamara.departamentos[StateCode]){
+        return PartidosCamara.departamentos[StateCode];
+    }
+    return [];
 }
 
+export function candidatosCamara(StateCode,partido){
+    if (CandidatosCamara.departamentos[StateCode][partido]){
+        return CandidatosCamara.departamentos[StateCode][partido];
+    }
+    return [];
+}
 
-export async function partidosSenado(){
+export function partidosSenado(){
     return PartidosSenado.partidos;
 }
 
-export async function candidatosSenado(partido){
-    return CandidatosSenado.partidos[partido];
+export function candidatosSenado(partido){
+    if (CandidatosSenado.partidos[partido]){
+        return CandidatosSenado.partidos[partido];
+    }
+    return [];
 }
