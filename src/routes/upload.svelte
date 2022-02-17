@@ -3,9 +3,9 @@
 	import { writable } from 'svelte/store';
 	import { getProfile, user, toLogin } from '$lib/account';
 	import QrScanner from 'qr-scanner';
-	import { puestoFromQR } from '$lib/data'
-	import Api from '$lib/api'
-	import GeoLocation from '$lib/GeoLocation.svelte'
+	import { puestoFromQR } from '$lib/data';
+	import Api from '$lib/api';
+	import GeoLocation from '$lib/GeoLocation.svelte';
 
 	let location;
 	let api;
@@ -53,7 +53,7 @@
 		let promises = [];
 		for (let i = 0; i < files.length; i++) {
 			const imageRaw = files[i];
-			promises.push(api.upload(location,filesQr[i],`${$user['custom:hash']}`,imageRaw));
+			promises.push(api.upload(location, filesQr[i], `${$user['custom:hash']}`, imageRaw));
 		}
 		Promise.all(promises).then((_r) => {
 			window.location.href = '/myimages';
@@ -65,7 +65,7 @@
 	<title>Subir Imágenes</title>
 </svelte:head>
 
-<GeoLocation bind:coords={location}/>
+<GeoLocation bind:coords={location} />
 
 {#if $user}
 	<div class="card card-cover overflow-hidden rounded-5 shadow-lg mt-2">
@@ -87,19 +87,22 @@
 					>
 						<img class="img-fluid" {src} alt="d" id="img-{i}" />
 						<div class="d-grid mt-2">
-						{#if !filesQr[i]}
-							<div class="btn btn-danger">
-								<i class="bi bi-qr-code" />
-								Error de QR
-							</div>
-						{:else}
-							<div class="btn btn-info">
-								Departamento: ({imageData[i].StateCode}) {imageData[i].StateName}<br/>
-								Municipio/Zona: ({imageData[i].MunicipalityCode}) {imageData[i].MunicipalityName} / {imageData[i].ZoneCode}<br/>
-								Puesto: ({imageData[i].PlaceCode}) {imageData[i].PlaceName}<br/>
-								Tipo/Mesa/Pagina: {#if imageData[i].PageType == "71"}Senado{:else}Camara{/if} / {imageData[i].Table} / {imageData[i].PageNumber}<br/>
-							</div>
-						{/if}
+							{#if !filesQr[i]}
+								<div class="btn btn-danger">
+									<i class="bi bi-qr-code" />
+									Error de QR
+								</div>
+							{:else}
+								<div class="btn btn-info">
+									Departamento: ({imageData[i].StateCode}) {imageData[i].StateName}<br />
+									Municipio/Zona: ({imageData[i].MunicipalityCode}) {imageData[i].MunicipalityName} /
+									{imageData[i].ZoneCode}<br />
+									Puesto: ({imageData[i].PlaceCode}) {imageData[i].PlaceName}<br />
+									Tipo/Mesa/Pagina: {#if imageData[i].PageType == '71'}Senado{:else}Camara{/if} / {imageData[
+										i
+									].Table} / {imageData[i].PageNumber}<br />
+								</div>
+							{/if}
 						</div>
 					</div>
 				{/each}
@@ -119,6 +122,6 @@
 
 <style lang="scss">
 	.d-flex img {
-		max-width: 150px;
+		max-width: 138px;
 	}
 </style>
