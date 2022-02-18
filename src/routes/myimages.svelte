@@ -36,7 +36,10 @@
 										Votar
 									</a>
 								{:else}
-									<div class="mt-2">Revisar</div>
+									<a class="btn btn-warning" href="/image/{image.ImageID}">
+										<i class="bi bi-archive" />
+										Revisar
+									</a>
 								{/if}
 							</div>
 						</div>
