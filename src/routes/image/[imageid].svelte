@@ -4,7 +4,9 @@
 	import Api from '$lib/api';
 	import { onMount } from 'svelte';
 	import TableReport from './report.svelte';
-	import FormReport from './form.svelte';
+	import FormSenado from './form_senado.svelte'
+	import FormCamara from './form_camara.svelte'
+	import FormConsulta from './form_consulta.svelte'
 
 	let image;
 	let api;
@@ -33,11 +35,13 @@
 				<img class="img-fluid" alt="img" src={image.url} />
 			</div>
 			{#if !image.info.OwnerReport}
-				<FormReport
-					bind:votes={image.votes}
-					TypeCode={image.info.TypeCode}
-					StateCode={image.info.StateCode}
-				/>
+				{#if image.info.TypeCode == 71}
+					<FormCamara bind:votes={image.votes} StateCode={image.info.StateCode} />
+				{:else if image.info.TypeCode == 72}
+					<FormSenado bind:votes={image.votes} />
+				{:else}
+					<FormSenado bind:votes={image.votes} />
+				{/if}
 				<TableReport bind:votes={image.votes} editable={true} />
 			{:else}
 				<TableReport votes={image.votes} />
