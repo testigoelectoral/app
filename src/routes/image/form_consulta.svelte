@@ -1,47 +1,51 @@
 <script>
-	import { candidatosCamara, candidatosSenado, partidosCamara, partidosSenado } from '$lib/data';
+  import {consultaCandidatos} from '$lib/data'
 
-	export let votes = {};
-	export let TypeCode;
-	export let StateCode;
+  export let votes = {};
+  export let TypeCode;
+  export let StateCode;
 
-	let partido = null;
-	let candidato = null;
-	let votesCandidate = null;
+  
+  let partido=null;
+  let candidato=null;
+  let votesCandidate=null;
+  let circuscripcion=null;
 
-	let partidos = TypeCode == 71 ? partidosCamara(StateCode) : partidosSenado();
 
-	function updateCandidatos(partido) {
-		const opcionesMesa = ['VOTOS EN BLANCO', 'VOTOS NO MARCADOS', 'VOTOS NULOS'];
-		if (!partido) {
-			return [];
-		}
+  let partidos = [
+      "COALICIÓN CENTRO ESPERANZA",
+      "EQUIPO POR COLOMBIA",
+      "PACTO HISTÓRICO"
+    ];
 
-		if (partido == 'DATOS MESA') {
-			return opcionesMesa;
-		}
+  function updateCandidatos(partido){
+    const opcionesMesa = ["VOTOS NO MARCADOS","VOTOS NULOS"]
+    if (!partido) {
+      return [];
+    }
 
-		if (TypeCode == 71) {
-			return ['VOTOS PARA LA LISTA'].concat(candidatosCamara(StateCode, partido));
-		} else {
-			return ['VOTOS PARA LA LISTA'].concat(candidatosSenado(StateCode, partido));
-		}
+    if (partido=="DATOS MESA") {
+      return opcionesMesa;
+    }
+
+    return consultaCandidatos(partido);
+  }
+ 
+  $: candidatos = updateCandidatos(partido);
+
+  function handleAdd() {
+		votes[partido+"|"+candidato]=votesCandidate;
 	}
 
-	$: candidatos = updateCandidatos(partido);
+  function onChangePartido() {
+    candidato=null;
+    votesCandidate=null
+  }
 
-	function handleAdd() {
-		votes[partido + '|' + candidato] = votesCandidate;
-	}
+  function onChangeCandidato() {
+    votesCandidate=null
+  }
 
-	function onChangePartido() {
-		candidato = null;
-		votesCandidate = null;
-	}
-
-	function onChangeCandidato() {
-		votesCandidate = null;
-	}
 </script>
 
 <div class="mt-2 px-2 py-2 border-4 rounded border border-info">

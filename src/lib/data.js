@@ -1,8 +1,9 @@
-import puestos from './dataPuestos.json';
-import PartidosCamara from './dataPartidosCamara.json';
-import CandidatosCamara from './dataCandidatosCamara.json';
-import PartidosSenado from './dataPartidosSenado.json';
-import CandidatosSenado from './dataCandidatosSenado.json';
+import Puestos from './data/puestos.json';
+import CamaraPartidos from './data/camara-partidos.json';
+import CamaraCandidatos from './data/camara-candidatos.json';
+import SenadoPartidos from './data/senado-partidos.json';
+import SenadoCandidatos from './data/senado-candidatos.json';
+import ConsultaCandidatos from './data/consulta-candidatos.json';
 
 export function puestoFromQR(qrcode){
     if (qrcode.length != 21){
@@ -33,9 +34,9 @@ export function puestoFromQR(qrcode){
         PlaceCode: PlaceCode,
         Table: qrcode.substring(11,14),
         PageNumber: qrcode.substring(14,16),
-        StateName: puestos.departamentos[StateCode].nombre,
-        MunicipalityName: puestos.departamentos[StateCode].municipios[MunicipalityCode].nombre,
-        PlaceName: puestos.departamentos[StateCode].municipios[MunicipalityCode].zonas[ZoneCode].puestos[PlaceCode],
+        StateName: Puestos.departamentos[StateCode].nombre,
+        MunicipalityName: Puestos.departamentos[StateCode].municipios[MunicipalityCode].nombre,
+        PlaceName: Puestos.departamentos[StateCode].municipios[MunicipalityCode].zonas[ZoneCode].puestos[PlaceCode],
     }
 }
 
@@ -53,27 +54,41 @@ export function puestoFromImageInfo(imageinfo){
     return puestoFromQR(qrcode)
 }
 
-export function partidosCamara(StateCode){
-    if (PartidosCamara.departamentos[StateCode]){
-        return PartidosCamara.departamentos[StateCode];
+export function camaraPartidos(StateCode,circuscripcion){
+    if (CamaraPartidos[StateCode][circuscripcion]){
+        return CamaraPartidos[StateCode][circuscripcion];
     }
     return [];
 }
 
-export function candidatosCamara(StateCode,partido){
-    if (CandidatosCamara.departamentos[StateCode][partido]){
-        return CandidatosCamara.departamentos[StateCode][partido];
+export function camaraCandidatos(StateCode,partido){
+    if (CamaraCandidatos[StateCode][partido]){
+        return CamaraCandidatos[StateCode][partido];
     }
     return [];
 }
 
-export function partidosSenado(){
-    return PartidosSenado.partidos;
+export function senadoCircuscripciones(){
+    return Object.keys(SenadoPartidos)
 }
 
-export function candidatosSenado(partido){
-    if (CandidatosSenado.partidos[partido]){
-        return CandidatosSenado.partidos[partido];
+export function senadoPartidos(circuscripcion){
+    if (SenadoPartidos[circuscripcion]){
+        return SenadoPartidos[circuscripcion];
+    }
+    return [];
+}
+
+export function senadoCandidatos(partido){
+    if (SenadoCandidatos[partido]){
+        return SenadoCandidatos[partido];
+    }
+    return [];
+}
+
+export function consultaCandidatos(partido){
+    if (ConsultaCandidatos[partido]){
+        return ConsultaCandidatos[partido];
     }
     return [];
 }
