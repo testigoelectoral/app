@@ -27,7 +27,11 @@
 					Cargando lista de imágenes ...
 				{:then images}
 					{#each images as image}
-						<div class="mt-2 me-2 px-2 py-2 border-4 rounded border border-success pr">
+						<div
+							class="mt-2 me-2 px-2 py-2 border-4 rounded border {image.OwnerReport
+								? 'border-warning'
+								: 'border-success'} pr"
+						>
 							<img class="img-fluid" alt="img" src={image.url} />
 							<div class="d-grid mt-2 pa b0">
 								{#if !image.OwnerReport}
