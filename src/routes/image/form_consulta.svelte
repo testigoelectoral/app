@@ -2,21 +2,17 @@
   import {consultaCandidatos} from '$lib/data'
 
   export let votes = {};
-  export let TypeCode;
-  export let StateCode;
-
   
   let partido=null;
   let candidato=null;
   let votesCandidate=null;
-  let circuscripcion=null;
-
 
   let partidos = [
-      "COALICIÓN CENTRO ESPERANZA",
-      "EQUIPO POR COLOMBIA",
-      "PACTO HISTÓRICO"
-    ];
+    "DATOS MESA",
+    "COALICIÓN CENTRO ESPERANZA",
+    "EQUIPO POR COLOMBIA",
+    "PACTO HISTÓRICO"
+  ];
 
   function updateCandidatos(partido){
     const opcionesMesa = ["VOTOS NO MARCADOS","VOTOS NULOS"]
@@ -47,7 +43,6 @@
   }
 
 </script>
-
 <div class="mt-2 px-2 py-2 border-4 rounded border border-info">
 	<form on:submit|preventDefault={handleAdd}>
 		<div class="form-floating mb-3">
@@ -59,7 +54,6 @@
 				on:change={onChangePartido}
 			>
 				<option value="null" selected disabled>Seleccione un partido</option>
-				<option value="DATOS MESA">DATOS MESA</option>
 				{#each partidos as p}
 					<option value={p}>{p}</option>
 				{/each}

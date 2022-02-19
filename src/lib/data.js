@@ -54,27 +54,37 @@ export function puestoFromImageInfo(imageinfo){
     return puestoFromQR(qrcode)
 }
 
-export function camaraPartidos(StateCode,circuscripcion){
-    if (CamaraPartidos[StateCode][circuscripcion]){
-        return CamaraPartidos[StateCode][circuscripcion];
+export function camaraCircunscripciones(StateCode){
+    return ["AFRODESCENDIENTES","INDIGENAS"].concat(Object.keys(CamaraPartidos[StateCode]));
+}
+
+export function camaraPartidos(StateCode,circunscripcion){
+    if(circunscripcion=="AFRODESCENDIENTES" || circunscripcion=="INDIGENAS"){
+        StateCode="00";
+    }
+    if (CamaraPartidos[StateCode][circunscripcion]){
+        return CamaraPartidos[StateCode][circunscripcion];
     }
     return [];
 }
 
-export function camaraCandidatos(StateCode,partido){
+export function camaraCandidatos(StateCode,circunscripcion,partido){
+    if(circunscripcion=="AFRODESCENDIENTES" || circunscripcion=="INDIGENAS"){
+        StateCode="00";
+    }
     if (CamaraCandidatos[StateCode][partido]){
         return CamaraCandidatos[StateCode][partido];
     }
     return [];
 }
 
-export function senadoCircuscripciones(){
+export function senadoCircunscripciones(){
     return Object.keys(SenadoPartidos)
 }
 
-export function senadoPartidos(circuscripcion){
-    if (SenadoPartidos[circuscripcion]){
-        return SenadoPartidos[circuscripcion];
+export function senadoPartidos(circunscripcion){
+    if (SenadoPartidos[circunscripcion]){
+        return SenadoPartidos[circunscripcion];
     }
     return [];
 }
