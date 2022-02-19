@@ -1,28 +1,29 @@
 <script>
-  import {senadoCandidatos, senadoPartidos, senadoCircunscripciones} from '$lib/data'
+  import {camaraCandidatos, camaraPartidos, camaraCircunscripciones} from '$lib/data'
 
   export let votes = {};
+  export let StateCode=16;
   
   let partido=null;
   let candidato=null;
   let votesCandidate=null;
   let circunscripcion="TERRITORIAL";
 
-  let circunscripciones = ["DATOS MESA"].concat(senadoCircunscripciones());
+  let circunscripciones = ["DATOS MESA"].concat(camaraCircunscripciones(StateCode));
   $: partidos = updatePartidos(circunscripcion);
   $: candidatos = updateCandidatos(partido);
 
 
-  function updatePartidos(circuscripcion){
-    if (!circuscripcion) {
+  function updatePartidos(circunscripcion){
+    if (!circunscripcion) {
       return [];
     }
 
-    if (circuscripcion=="DATOS MESA") {
+    if (circunscripcion=="DATOS MESA") {
       return ["DATOS MESA"];
     }
 
-    return senadoPartidos(circuscripcion);
+    return camaraPartidos(StateCode,circunscripcion);
   }
   
   function updateCandidatos(partido){
@@ -35,7 +36,7 @@
       return opcionesMesa;
     }
 
-    return ["VOTOS PARA LA LISTA"].concat(senadoCandidatos(partido))
+    return ["VOTOS PARA LA LISTA"].concat(camaraCandidatos(StateCode,circunscripcion,partido))
   }
  
   function handleAdd() {

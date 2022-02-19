@@ -35,12 +35,12 @@
 				<img class="img-fluid" alt="img" src={image.url} />
 			</div>
 			{#if !image.info.OwnerReport}
-				{#if image.info.TypeCode == 71}
+				{#if image.info.TypeCode == 72}
 					<FormCamara bind:votes={image.votes} StateCode={image.info.StateCode} />
-				{:else if image.info.TypeCode == 72}
+				{:else if image.info.TypeCode == 71}
 					<FormSenado bind:votes={image.votes} />
 				{:else}
-					<FormSenado bind:votes={image.votes} />
+					<FormConsulta bind:votes={image.votes} />
 				{/if}
 				<TableReport bind:votes={image.votes} editable={true} />
 			{:else}
