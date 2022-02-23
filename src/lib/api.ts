@@ -10,7 +10,12 @@ export default class Api {
 			'X-Amz-Meta-Qr-Code': qrcode,
 			'Content-Type': imageRaw.type
 		};
-		return this.put('/myimages', headers, imageRaw);
+
+		const put_result = await this.put('/myimages', headers, imageRaw);
+		return this.put('/processing', {'Content-Type': 'application/json'}, {
+			ImageID: put_result.ImageID,
+			Reason: "Image Uploaded"
+		});
 	}
 
 	async image(imageid: string): Promise<any> {
@@ -24,22 +29,49 @@ export default class Api {
 	}
 
 	async report(imageid: string, votes: any): Promise<any> {
-		return await this.put(
+		await this.put(
 			'/myimages/' + imageid + '/votes',
 			{ 'Content-Type': 'application/json' },
 			{ votes: votes }
 		);
+
+		return this.put('/processing', {'Content-Type': 'application/json'}, {
+			ImageID: imageid,
+			Reason: "Votes Submitted"
+		});
 	}
 
 	async myImages(): Promise<any[]> {
-		let res = await this.get('/myimages');
+		let images = await this.get('/myimages');
+
 		const apiurl = this.API_URL;
-		res.forEach(function (value: any, index: number) {
-			res[index].url = apiurl + '/images/' + value.ImageID;
+		images.forEach(function (value: any, index: number) {
+			images[index].url = apiurl + '/images/' + value.ImageID;
+			images[index].processing = "";
+
 		});
-		return res;
+
+		let processing = await this.get('/processing');
+
+		processing.forEach(function (value: any) {
+			let index = images.findIndex(image => image.ImageID == value.ImageID )
+			if (index != -1){
+				images[index].processing = value.Reason;
+			}else{
+				images.push({
+					ImageID: value.ImageID,
+					url: apiurl + '/images/' + value.ImageID,
+					processing: value.Reason
+				})
+			}
+		});
+		console.log(images);
+		return images;
 	}
 
+	async processing(): Promise<any> {
+		return this.get('/processing');
+	}
 	private async put(path: string, headers: any = {}, body: any = undefined): Promise<any> {
 		return await this.call('put', path, headers, body);
 	}

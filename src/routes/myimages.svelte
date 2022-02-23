@@ -32,9 +32,14 @@
 								? 'border-warning'
 								: 'border-success'} pr"
 						>
-							<img class="img-fluid" alt="img" src={image.url} />
+						<img class="img-fluid" alt="img" src={image.url} />
 							<div class="d-grid mt-2 pa b0">
-								{#if !image.OwnerReport}
+								{#if image.processing}
+									<div class="btn btn-info">
+										<i class="bi bi-archive" />
+										Procesando
+									</div>
+								{:else if !image.OwnerReport}
 									<a class="btn btn-success" href="/image/{image.ImageID}">
 										<i class="bi bi-archive" />
 										Votar
